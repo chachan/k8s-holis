@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: flask-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - args:
+        - uwsgi
+        - --ini
+        - uwsgi.staging.ini
+        image: flask:replace-me
+        name: flask
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "768Mi"
+            cpu: "300m"
+        env:
+        - name: FLASK_APP
+          valueFrom:
+            configMapKeyRef:
+              key: FLASK_APP
+              name: flask-configmap
